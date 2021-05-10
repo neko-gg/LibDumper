@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity(), Handler.Callback {
             startActivity(
                 Intent(
                     ACTION_VIEW,
-                    Uri.parse("https://github.com/MrPictYT-art/LibDumper")
+                    Uri.parse("https://github.com/BryanGIG/LibDumper")
                 )
             )
         }

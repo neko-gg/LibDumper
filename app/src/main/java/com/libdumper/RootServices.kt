@@ -3,11 +3,7 @@ package com.libdumper
 import android.content.Intent
 import android.os.*
 import android.util.Log
-import com.kmrite.Tools
 import com.topjohnwu.superuser.ipc.RootService
-import java.io.ByteArrayOutputStream
-import java.io.FileInputStream
-import java.io.IOException
 
 class RootServices : RootService(), Handler.Callback {
 
@@ -22,9 +18,14 @@ class RootServices : RootService(), Handler.Callback {
         if (msg.what != MSG_GETINFO) return false
         val reply = Message.obtain()
         val data = Bundle()
+        val native = msg.data.getString("native")
         val pkg = msg.data.getString("pkg")
         val file = msg.data.getString("file_dump")
-        data.putString("result", Tools.dumpFile(pkg!!, file!!))
+        if (native != null && pkg != null && file != null) {
+            data.putString("result", Tools.dumpFile(native, pkg, file))
+        } else {
+            data.putString("result", "Invalid Data!!")
+        }
         reply.data = data
         try {
             msg.replyTo.send(reply)

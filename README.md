@@ -1,8 +1,10 @@
 # LibDumper
 This Project Is Using For Make You Easy Dump Lib From The Memory
 
-# Changelog 3.2 :
-- support root devices
+# Changelog 3.3 :
+- auto fix ELF file
+- removing libUE4.so option
+- fixing some bugs
 
 # Features
 - support for dumping global-metadata.dat from memory
@@ -13,13 +15,14 @@ This Project Is Using For Make You Easy Dump Lib From The Memory
 
 # Usage :
 - run the app game 
-- run app-debug / app-debug64.apk
+- run app-debug.apk
 - put the package name from the game
-- put the lib name (if you want) (default name is "libil2cpp.so" and "libUE4.so")
-- check the dump metadata if you want to dump the metadata from memory (only available on il2cpp dump)
-- select dump "ue4" or "il2cpp"
+- put the lib name (if you want) (default name is "libil2cpp.so")
+- check the dump metadata if you want to dump the metadata from memory
+- press button "Dump"
 - wait progress done
-- check your /sdcard
+- check your /sdcard/Download
 
 # Credit :
 - libsu : https://github.com/topjohnwu/libsu
+- elf-dump-fix : https://github.com/maiyao1988/elf-dump-fix

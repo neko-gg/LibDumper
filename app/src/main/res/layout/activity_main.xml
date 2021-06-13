@@ -93,20 +93,11 @@
 
         <Button
             style="?android:attr/buttonBarButtonStyle"
-            android:id="@+id/dumpUE4"
+            android:id="@+id/beginDump"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/dump_lib_ue4" />
-
-        <Button
-            style="?android:attr/buttonBarButtonStyle"
-            android:id="@+id/dumpil2cpp"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="2dp"
-            android:layout_weight="1"
-            android:text="@string/dump_lib_il2cpp" />
+            android:text="@string/dump" />
 
     </LinearLayout>
 

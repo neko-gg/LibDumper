@@ -1,8 +1,11 @@
-package com.libdumper
+package com.libdumper.root
 
 import android.content.Intent
 import android.os.*
 import android.util.Log
+import com.libdumper.Utils.MSG_GETINFO
+import com.libdumper.Utils.TAG
+import com.libdumper.dumper.Dumper
 import com.topjohnwu.superuser.ipc.RootService
 
 class RootServices : RootService(), Handler.Callback {
@@ -18,11 +21,12 @@ class RootServices : RootService(), Handler.Callback {
         if (msg.what != MSG_GETINFO) return false
         val reply = Message.obtain()
         val data = Bundle()
-        val native = msg.data.getString("native")
+        val nativeDir = msg.data.getString("native")
+        val fixMe = msg.data.getBoolean("fixMe")
         val pkg = msg.data.getString("pkg")
         val file = msg.data.getString("file_dump")
-        if (native != null && pkg != null && file != null) {
-            data.putString("result", Tools.dumpFile(native, pkg, file))
+        if (nativeDir != null && pkg != null && file != null) {
+            data.putString("result", Dumper(nativeDir,pkg, file).dumpFile(fixMe))
         } else {
             data.putString("result", "Invalid Data!!")
         }
@@ -39,10 +43,5 @@ class RootServices : RootService(), Handler.Callback {
         Log.d(TAG, "RootServices: onUnbind, client process unbound")
         // Default returns false, which means NOT daemon mode
         return super.onUnbind(intent)
-    }
-
-    companion object {
-        const val TAG = "IPC"
-        const val MSG_GETINFO = 1
     }
 }

@@ -1,6 +1,7 @@
 package com.libdumper
 
 import android.Manifest
+import android.app.Activity
 import android.content.ComponentName
 import android.content.Intent
 import android.content.Intent.ACTION_VIEW
@@ -10,26 +11,22 @@ import android.net.Uri
 import android.os.*
 import android.util.Log
 import android.widget.ScrollView
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
+import com.libdumper.Utils.TAG
 import com.libdumper.databinding.ActivityMainBinding
+import com.libdumper.dumper.Dumper
+import com.libdumper.root.RootServices
 import com.topjohnwu.superuser.CallbackList
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ipc.RootService
 
-
-class MainActivity : AppCompatActivity(), Handler.Callback {
+class MainActivity : Activity(), Handler.Callback {
     lateinit var bind: ActivityMainBinding
     private val myMessenger = Messenger(Handler(Looper.getMainLooper(), this))
     var remoteMessenger: Messenger? = null
     private var serviceTestQueued = false
     private var conn: MSGConnection? = null
-    private var Exec = ""
-
-    companion object {
-        const val TAG = "LibDumper"
-    }
-
+    private var nativeDir = ""
+    private var needFix: Boolean = false
     private fun initRoot() {
         if (Shell.rootAccess()) {
             if (remoteMessenger == null) {
@@ -45,24 +42,22 @@ class MainActivity : AppCompatActivity(), Handler.Callback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         bind = ActivityMainBinding.inflate(layoutInflater)
-        reqStorage()
         initRoot()
-        Exec = applicationInfo.nativeLibraryDir
+        nativeDir = applicationInfo.nativeLibraryDir
 
         with(bind) {
             setContentView(root)
             beginDump.setOnClickListener {
-                if (bind.pkg.text != null) {
-                    if (metadata.isChecked) {
+                if (pkg.text != null) {
+                    if (metadata.isChecked)
                         runNative("global-metadata.dat")
-                    }
 
+                    needFix = autoFix.isChecked
                     runNative(
-                        if (libName.text.isNullOrBlank()) {
+                        if (libName.text.isNullOrBlank())
                             "libil2cpp.so"
-                        } else {
+                        else
                             libName.text.toString()
-                        }
                     )
                 } else {
                     consoleList.add("put pkg name!")
@@ -79,19 +74,6 @@ class MainActivity : AppCompatActivity(), Handler.Callback {
         }
     }
 
-    private fun reqStorage() {
-        val permission = ActivityCompat.checkSelfPermission(
-            this,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        )
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                10
-            )
-        }
-    }
 
     override fun handleMessage(msg: Message): Boolean {
         val dump = msg.data.getString("result")
@@ -102,15 +84,16 @@ class MainActivity : AppCompatActivity(), Handler.Callback {
     private fun runNative(file: String) {
         val pkg = bind.pkg.text.toString()
         if (Shell.rootAccess()) {
-            dumpRoot(pkg, file)
+            sendRequest(pkg, file)
         } else {
-            consoleList.add(Tools.dumpFile(Exec,pkg, file))
+            consoleList.add(Dumper(nativeDir,pkg, file).dumpFile(needFix))
         }
     }
 
-    private fun dumpRoot(pkg: String, file: String) {
-        val message: Message = Message.obtain(null, RootServices.MSG_GETINFO)
-        message.data.putString("native",Exec)
+    private fun sendRequest(pkg: String, file: String) {
+        val message: Message = Message.obtain(null, Utils.MSG_GETINFO)
+        message.data.putBoolean("fixMe", needFix)
+        message.data.putString("native",nativeDir)
         message.data.putString("pkg", pkg)
         message.data.putString("file_dump", file)
         message.replyTo = myMessenger

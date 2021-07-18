@@ -1,4 +1,4 @@
-package com.libdumper
+package com.libdumper.dumper
 
 data class Memory(val pkg: String) {
     var pid: Int = 0

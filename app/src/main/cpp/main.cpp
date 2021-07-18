@@ -2,15 +2,23 @@
 #include <cstdlib>
 #include <sys/mman.h>
 #include <cerrno>
+#include <iostream>
 #include "fixer/fix.h"
 
-int main(int argc, char *argv[]) {
-    if (argc < 4) {
-        printf("<src_so_path> <base_addr_in_memory_in_hex> <out_so_path>\n");
-        return -1;
-    }
-    const char *openPath = argv[1];
-    uint64_t base = strtoull(argv[2], 0, 16);
-    const char *outPutPath = argv[3];
-    fix_so(openPath, outPutPath, base);
+using namespace std;
+
+uintptr_t getHexAddr(const char *addr) {
+#ifndef __SO64__
+    return (uintptr_t) strtoul(addr, nullptr, 16);
+#else
+    return (uintptr_t) strtoull(addr, nullptr, 16);
+#endif
+}
+
+int main(int argc, char **argv) {
+    string tempPath = argv[1];
+    uintptr_t start_addr = getHexAddr(argv[2]);
+    string outPath = argv[3];
+
+    fix_so(tempPath.c_str(), outPath.c_str(), start_addr);
 }

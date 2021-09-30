@@ -15,7 +15,7 @@ This Project Is Using For Make You Easy Dump Lib From The Memory
 
 # Usage :
 - run the app game 
-- run [app-debug.apk](https://github.com/BryanGIG/LibDumper/releases)
+- run [app-debug.apk](https://github.com/neko-gg/LibDumper/releases)
 - put the package name from the game
 - put the lib name (default name is "libil2cpp.so")
 - check the dump metadata if you want to dump the metadata from memory
